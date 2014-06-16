@@ -1,5 +1,5 @@
 Require Import Coq.Lists.List.
-Require Import Coq.Sorting.Sorted.
+Require Import Coq.Sorting.Sorted ZArith.
 
 Module Quicksort.
 
@@ -14,139 +14,12 @@ Lemma split_accto_pivot : forall {A}
                                         In x pre \/ In x post) /\
                              (length pre + length post = length list)}}.
 Proof.
-  intros A ord total piv list.
-  induction list.
-  exists nil.
-  exists nil.
-  split.
-  intros x innil.
-  inversion innil.
-  split.
-  intros x innil.
-  inversion innil.
-  split.
-  intros x.
-  split.
-  intros innil.
-  inversion innil.
-  intros innil.
-  elim innil.
-  trivial.
-  trivial.
-  reflexivity.
-  assert ({pre : Datatypes.list A |
-           {post : Datatypes.list A |
-            (forall x : A, In x pre -> ord x piv) /\
-            (forall x : A, In x post -> ord piv x) /\
-            (forall x : A, In x list <-> In x pre \/ In x post) /\
-            (length pre + length post = length list)}}).
-  apply IHlist.
-  elim X.
-  intros pre' pre_chunk.
-  elim pre_chunk.
-  intros post' ex'.
-  elim ex'.
-  intros H H0.
-  elim H0.
-  intros H1 H2.
-  elim H2.
-  intros H3 H4.
-  elim (total piv a).
-  intros opa.
-  exists pre'.
-  exists (a :: post').
-  split.
-  auto.
-  split.
-  intros x inx.
-  inversion inx.
-  rewrite <- H5.
-  apply opa.
-  auto.
-  split.
-  intros x. 
-  split.
-  intros inx.
-  inversion inx.
-  apply or_intror.
-  rewrite <- H5.
-  apply in_eq.
-  assert (H6 : In x pre' \/ In x post').
-  apply H2.
-  apply H5.
-  elim H6.
-  auto.
-  intros inxpost.
-  apply or_intror.
-  apply in_cons.
-  apply inxpost.
-  intros in_or.
-  elim in_or.
-  intros inxpre.
-  apply in_cons.
-  apply H3.
-  auto.
-  intros inapost.
-  inversion inapost.
-  rewrite -> H5.
-  apply in_eq.
-  apply in_cons.
-  apply H3.
-  auto.
-  replace (length (a :: list)) with (S (length list)).
-  replace (length (a :: post')) with (S (length post')).
-  rewrite <- plus_n_Sm.
-  rewrite -> H4.
-  reflexivity.
-  reflexivity.
-  reflexivity.
-  intros oap.
-  exists (a :: pre').
-  exists post'.
-  split.
-  intros x inx.
-  inversion inx.
-  rewrite <- H5.
-  apply oap.
-  apply H.
-  apply H5.
-  split.
-  auto.
-  split.
-  intros x. 
-  split.
-  intros inx.
-  inversion inx.
-  apply or_introl.
-  rewrite <- H5.
-  apply in_eq.
-  assert (myor : In x pre' \/ In x post').
-  apply H3.
-  apply H5.
-  elim myor.
-  intros inxpre.
-  apply or_introl.
-  apply in_cons.
-  apply inxpre.
-  auto.
-  intros inor.
-  elim inor.
-  intros inapre.
-  inversion inapre.
-  rewrite -> H5.
-  apply in_eq.
-  apply in_cons.
-  apply H3.
-  auto.
-  intro inxpost.
-  apply in_cons.
-  apply H3.
-  auto.
-  replace (length (a :: pre')) with (S (length pre')).
-  rewrite -> plus_Sn_m.
-  rewrite -> H4.
-  reflexivity.
-  reflexivity.
+  intros ? ? ? pivot list; induction list as [|a ? IHlist];
+  [exists nil,nil;firstorder
+  |destruct IHlist as [pre [post ?]];
+   destruct (total pivot a);
+   [exists pre,(a::post)|exists (a::pre),post]; firstorder subst; auto;
+   simpl; omega].
 Qed.
 
 Lemma quicksort_conc_lemma : forall {A}
